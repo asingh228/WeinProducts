@@ -22,24 +22,26 @@ export function App() {
   const [activeVideo, setActiveVideo] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mediaVisible, setMediaVisible] = useState(false);
-  const [soundOn, setSoundOn] = useState(false);
-  const mediaRef = useRef(null);
+  const [mediaStarted, setMediaStarted] = useState(false);
+  const videoStageRef = useRef(null);
   const iframeRef = useRef(null);
   const hasEnteredMedia = useRef(false);
+  const playerRetryTimers = useRef([]);
   const current = videos[activeVideo];
 
   useEffect(() => {
-    const section = mediaRef.current;
-    if (!section) return undefined;
+    const videoStage = videoStageRef.current;
+    if (!videoStage) return undefined;
     const observer = new IntersectionObserver(([entry]) => {
-      const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.35;
+      const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.45;
       setMediaVisible(isVisible);
+      if (isVisible) setMediaStarted(true);
       if (isVisible && !hasEnteredMedia.current) {
         hasEnteredMedia.current = true;
         setActiveVideo(0);
       }
-    }, { threshold: [0, 0.35, 0.7] });
-    observer.observe(section);
+    }, { threshold: [0, 0.45, 0.75] });
+    observer.observe(videoStage);
     return () => observer.disconnect();
   }, []);
 
@@ -47,33 +49,32 @@ export function App() {
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args: [] }), 'https://www.youtube-nocookie.com');
   };
 
-  const playWithSound = () => {
-    sendPlayerCommand('unMute');
+  const playVideo = () => {
     sendPlayerCommand('playVideo');
-    setSoundOn(true);
+  };
+
+  const clearPlayerRetries = () => {
+    playerRetryTimers.current.forEach(window.clearTimeout);
+    playerRetryTimers.current = [];
+  };
+
+  const requestPlayback = () => {
+    clearPlayerRetries();
+    playVideo();
+    playerRetryTimers.current = [250, 700, 1400].map((delay) => window.setTimeout(playVideo, delay));
   };
 
   const initializePlayer = () => {
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'setOption', args: ['captions', 'track', {}] }), 'https://www.youtube-nocookie.com');
-    if (mediaVisible) playWithSound();
-  };
-
-  const toggleSound = () => {
-    if (soundOn) {
-      sendPlayerCommand('mute');
-      setSoundOn(false);
-    } else {
-      playWithSound();
-    }
+    if (mediaVisible) requestPlayback();
   };
 
   useEffect(() => {
     if (!iframeRef.current) return;
-    if (mediaVisible) playWithSound();
+    if (mediaVisible) requestPlayback();
     else {
-      sendPlayerCommand('mute');
+      clearPlayerRetries();
       sendPlayerCommand('pauseVideo');
-      setSoundOn(false);
     }
   }, [mediaVisible, activeVideo]);
 
@@ -158,16 +159,15 @@ export function App() {
         </div>
       </section>
 
-      <section className="media" id="media" ref={mediaRef}>
+      <section className="media" id="media">
         <p className="eyebrow">The complete story</p><h2>See it in action.</h2>
-        <div className="video-stage">
+        <div className="video-stage" ref={videoStageRef}>
           {current.youtubeId ? (
-            <iframe ref={iframeRef} key={current.youtubeId} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${current.youtubeId}?enablejsapi=1&autoplay=0&mute=1&playsinline=1&rel=0&cc_load_policy=0`} title={current.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+            <iframe ref={iframeRef} key={current.youtubeId} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${current.youtubeId}?enablejsapi=1&autoplay=${mediaStarted ? 1 : 0}&mute=1&playsinline=1&rel=0&cc_load_policy=0&origin=${encodeURIComponent(window.location.origin)}`} title={current.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
           ) : (
             <div className="video-placeholder"><img src={current.image} alt="" /><div><span className="play">Play</span><p>{current.title}</p><small>YouTube video ready</small></div></div>
           )}
         </div>
-        <button className="sound-on" type="button" onClick={toggleSound} aria-pressed={soundOn}>{soundOn ? 'Turn sound off' : 'Turn sound on'}</button>
         <div className="filmstrip-wrap">
           <button type="button" onClick={() => moveVideo(-1)} aria-label="Previous video">Previous</button>
           <div className="filmstrip" role="tablist" aria-label="Videos">
