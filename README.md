@@ -1,19 +1,22 @@
-# OMEGA ARIS-660B Product Experience
+# OMEGA ARIS-660B Integrated Product Campaign
 
-An immersive, responsive product landing page for the OMEGA ARIS-660B bullion coin testing system by Wein Products Inc.
+An AI-assisted video campaign, product storytelling system, and responsive launch experience for the OMEGA ARIS-660B bullion coin testing system by Wein Products Inc.
 
-[View the live experience](https://asingh228.github.io/WeinProducts/) · [Visit Wein Products](https://weinproducts.com/)
-
-![OMEGA ARIS-660B product presentation](public/assets/generated/hero-fullbleed.png)
+[View the live experience](https://asingh228.github.io/WeinProducts/)
 
 ## Project overview
 
-This project translates a specialized technical product into a clear, premium digital story for bullion professionals. The client needed a modern product page that could introduce the OMEGA ARIS-660B, explain why full-volume acoustic analysis matters, establish confidence in the technology, and create anticipation ahead of commercial availability.
+This project translates a specialized technical product into a coordinated launch story for bullion professionals. The assignment extended well beyond a landing page: it included campaign strategy, product positioning, concept development, scriptwriting, storyboarding, generative video production, visual asset creation, editorial direction, and the design and implementation of the final web experience.
 
-The experience was designed to feel closer to a contemporary product launch than a traditional industrial equipment page: focused messaging, generous visual space, cinematic product imagery, progressive technical education, and a clear path from awareness to product interest.
+The client needed a complete media system that could introduce the OMEGA ARIS-660B, explain why full-volume acoustic analysis matters, establish confidence in the technology, and create anticipation ahead of commercial availability. The resulting campaign combines a primary product film, eight short-form ads, supporting imagery, technical visualizations, and a modern product site into one consistent narrative.
 
-The final deliverable is both:
+The work was designed to feel closer to a contemporary product launch than a traditional industrial equipment presentation: focused messaging, cinematic product imagery, memorable campaign concepts, progressive technical education, and a clear path from awareness to product interest.
 
+The final deliverables include:
+
+- A campaign video package comprising a primary product overview and eight advertising concepts.
+- Scripts, narrative structures, shot concepts, and storyboards developed for multiple audiences and campaign angles.
+- AI-generated and art-directed video and image assets refined through an editorial workflow.
 - A live React experience deployed through GitHub Pages.
 - A portable static build that can be uploaded to a conventional web server or integrated into a future commerce platform.
 
@@ -27,14 +30,28 @@ The main objectives were to:
 - Position acoustic resonance as the core product differentiator.
 - Communicate that the system helps evaluate the entire coin—not only a localized center point.
 - Present technical information without overwhelming a non-engineering buyer.
+- Develop the primary product story, scripts, storyboards, shot language, and supporting campaign concepts.
+- Create a family of ads that could communicate different benefits while remaining part of one recognizable campaign.
 - Support a launch-stage “Coming soon” state while leaving room for future Shopify or add-to-cart integration.
 - Give one primary product video and eight campaign videos substantial space within the experience.
 - Deliver a polished result on a short production timeline.
 - Ensure technical and marketing language used appropriately qualified claims such as “helps verify.”
 
-## Experience strategy
+## Campaign and experience strategy
 
-The page uses progressive disclosure to move visitors from a simple value proposition into deeper product education:
+The central creative challenge was to turn a technical testing process into stories that could be understood quickly. Video concepts were developed around recognizable risks, moments of doubt, contrasting outcomes, product demonstrations, and the value of inspecting more than a localized area of a coin.
+
+The campaign-development process included:
+
+- Converting technical source material and client conversations into audience-facing story premises.
+- Writing and refining the primary product narrative and short-form advertising scripts.
+- Building storyboards, shot progressions, visual references, and timing plans before generation and editing.
+- Exploring multiple creative routes so individual ads could emphasize trust, risk, speed, workflow, or product differentiation.
+- Generating video shots and supporting visual assets across multiple AI platforms.
+- Selecting, sequencing, compositing, and refining generated material into coherent edits in Final Cut Pro.
+- Maintaining consistent product proportions, brand language, lighting, color, and messaging across separately generated scenes.
+
+The web experience then gives the campaign a durable product context. It uses progressive disclosure to move visitors from a simple value proposition into deeper product education:
 
 1. **Immediate product identification** — The opening section names the product, explains its purpose, and pairs it with a recognizable product view.
 2. **Three concise proof points** — Acoustic resonance, full-volume analysis, and workflow clarity establish the core story at a glance.
@@ -61,12 +78,17 @@ AI was used as a production accelerator across design, content, imagery, and imp
 - Claims were reviewed and deliberately qualified to support responsible product communication.
 - The final structure reflects iterative client feedback about terminology, emphasis, hierarchy, and what a first-time visitor needs to understand.
 
-### Media workflow
+### Video and media production
 
-- Video links were organized into a coherent viewing sequence with a dedicated product overview followed by campaign ads.
+- AI-assisted ideation was used to explore campaign hooks, visual metaphors, character moments, technical demonstrations, and short-form ad structures.
+- Product information was translated into scripts, voiceover directions, scene descriptions, shot lists, and storyboards before production.
+- Generative video workflows were used to develop cinematic shots, product contexts, transitions, and campaign-specific imagery.
+- Multiple model outputs were evaluated for continuity, product fidelity, composition, motion quality, and editorial usefulness.
+- Final Cut Pro was used to assemble and refine footage, shape pacing, establish narrative rhythm, and prepare finished campaign assets.
+- The completed video set was organized into a coherent viewing sequence with a dedicated product overview followed by eight ads.
 - YouTube thumbnail imagery was collected and incorporated into the custom media navigation.
 - AI-assisted debugging and browser testing were used to work through autoplay restrictions, caption defaults, persistent volume state, playlist continuity, and cross-origin player behavior.
-- The videos themselves remain YouTube-hosted, keeping the deployable package lightweight and easy to maintain.
+- Final videos remain YouTube-hosted, keeping the deployable web package lightweight and easy to maintain.
 
 ### Frontend implementation
 
@@ -111,6 +133,9 @@ Pushing to `main` runs the GitHub Actions workflow in `.github/workflows/pages.y
 
 - Client discovery and iterative stakeholder communication.
 - Translation of a complex technical product into accessible buyer-facing language.
+- Campaign concept development, copywriting, scripts, shot lists, and storyboards.
+- Multi-model generative video direction and continuity management.
+- Editorial judgment, pacing, and post-production in Final Cut Pro.
 - Visual direction for an industrial product with a premium consumer presentation.
 - Responsible use of generative AI in a commercial creative workflow.
 - Responsive design and breakpoint-specific art direction.
@@ -122,6 +147,13 @@ Pushing to `main` runs the GitHub Actions workflow in `.github/workflows/pages.y
 
 ## Technology
 
+- OpenAI Image 2.0
+- Codex 5.5 and 5.6
+- Gemini 3.1 Pro and 3.5 Flash
+- Veo 3.1
+- Anthropic Fable and Opus 4.8
+- Grok 4.5
+- Final Cut Pro
 - React 19
 - Vite 6
 - Modern CSS
