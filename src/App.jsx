@@ -46,8 +46,13 @@ export function App() {
     return () => observer.disconnect();
   }, []);
 
-  const sendPlayerCommand = (command) => {
-    iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args: [] }), 'https://www.youtube-nocookie.com');
+  const sendPlayerCommand = (command, args = []) => {
+    iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args }), 'https://www.youtube-nocookie.com');
+  };
+
+  const disableCaptions = () => {
+    sendPlayerCommand('setOption', ['captions', 'track', {}]);
+    sendPlayerCommand('unloadModule', ['captions']);
   };
 
   const playVideo = () => {
@@ -66,7 +71,9 @@ export function App() {
   };
 
   const initializePlayer = () => {
-    iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'setOption', args: ['captions', 'track', {}] }), 'https://www.youtube-nocookie.com');
+    disableCaptions();
+    window.setTimeout(disableCaptions, 500);
+    window.setTimeout(disableCaptions, 1200);
     if (mediaVisible) requestPlayback();
   };
 
