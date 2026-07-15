@@ -192,6 +192,7 @@ export function App() {
           )}
         </div>
         <button className="sound-toggle" type="button" onClick={toggleSound} aria-pressed={soundOn}>
+          <span className="sound-indicator" aria-hidden="true" />
           {soundOn ? 'Turn volume off' : 'Turn volume on'}
         </button>
         <div className="filmstrip-wrap">
