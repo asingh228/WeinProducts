@@ -23,6 +23,7 @@ export function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mediaVisible, setMediaVisible] = useState(false);
   const [mediaStarted, setMediaStarted] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
   const videoStageRef = useRef(null);
   const iframeRef = useRef(null);
   const hasEnteredMedia = useRef(false);
@@ -68,6 +69,21 @@ export function App() {
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'setOption', args: ['captions', 'track', {}] }), 'https://www.youtube-nocookie.com');
     if (mediaVisible) requestPlayback();
   };
+
+  const toggleSound = () => {
+    if (soundOn) {
+      sendPlayerCommand('mute');
+      setSoundOn(false);
+    } else {
+      sendPlayerCommand('unMute');
+      sendPlayerCommand('playVideo');
+      setSoundOn(true);
+    }
+  };
+
+  useEffect(() => {
+    setSoundOn(false);
+  }, [activeVideo]);
 
   useEffect(() => {
     if (!iframeRef.current) return;
@@ -168,6 +184,9 @@ export function App() {
             <div className="video-placeholder"><img src={current.image} alt="" /><div><span className="play">Play</span><p>{current.title}</p><small>YouTube video ready</small></div></div>
           )}
         </div>
+        <button className="sound-toggle" type="button" onClick={toggleSound} aria-pressed={soundOn}>
+          {soundOn ? 'Turn volume off' : 'Turn volume on'}
+        </button>
         <div className="filmstrip-wrap">
           <button type="button" onClick={() => moveVideo(-1)} aria-label="Previous video">Previous</button>
           <div className="filmstrip" role="tablist" aria-label="Videos">
