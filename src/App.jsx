@@ -33,6 +33,15 @@ const videos = [
   { title: 'AD 8', image: asset('assets/video-thumbnails/ad-8.jpg'), youtubeId: 'PIpwihO54ys' },
 ];
 const playlistIds = videos.map((video) => video.youtubeId);
+const waveformBars = Array.from({ length: 72 }, (_, index) => {
+  const center = 1 - Math.abs(index - 35.5) / 35.5;
+  const texture = Math.abs(Math.sin(index * 1.73) * .62 + Math.cos(index * .47) * .38);
+  return {
+    height: `${14 + center * 90 * (.34 + texture * .66)}%`,
+    delay: `${-(index % 13) * .11}s`,
+    duration: `${1.25 + (index % 9) * .13}s`,
+  };
+});
 
 function ComingSoon() {
   return <button className="coming" type="button" aria-label="Product coming soon">Coming soon</button>;
@@ -214,8 +223,9 @@ export function App() {
         <h2>Full-volume acoustic analysis.</h2>
         <p>The OMEGA ARIS-660B uses acoustic resonance technology to help analyze the entire volume of a coin. Its sound signature can help identify internal structural anomalies that conventional spot checks may leave unresolved.</p>
         <div className="waveform" aria-hidden="true">
-          <img src={asset('assets/generated/acoustic-waveform.png')} alt="" />
-          <img src={asset('assets/generated/acoustic-waveform.png')} alt="" />
+          {waveformBars.map((bar, index) => (
+            <span key={index} style={{ '--bar-height': bar.height, '--bar-delay': bar.delay, '--bar-duration': bar.duration }} />
+          ))}
         </div>
       </section>
 
