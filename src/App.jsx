@@ -71,10 +71,17 @@ export function App() {
   };
 
   const initializePlayer = () => {
+    iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ event: 'listening', id: 'omega-video-player' }), 'https://www.youtube-nocookie.com');
     disableCaptions();
     window.setTimeout(disableCaptions, 500);
     window.setTimeout(disableCaptions, 1200);
-    if (mediaVisible) requestPlayback();
+    if (mediaVisible) {
+      requestPlayback();
+      if (soundOn) {
+        sendPlayerCommand('unMute');
+        window.setTimeout(() => sendPlayerCommand('unMute'), 500);
+      }
+    }
   };
 
   const toggleSound = () => {
@@ -89,8 +96,19 @@ export function App() {
   };
 
   useEffect(() => {
-    setSoundOn(false);
-  }, [activeVideo]);
+    const handlePlayerMessage = (event) => {
+      if (!event.origin.includes('youtube')) return;
+      let data = event.data;
+      if (typeof data === 'string') {
+        try { data = JSON.parse(data); } catch { return; }
+      }
+      if (data?.event === 'onStateChange' && data.info === 0 && mediaVisible) {
+        setActiveVideo((value) => (value + 1) % videos.length);
+      }
+    };
+    window.addEventListener('message', handlePlayerMessage);
+    return () => window.removeEventListener('message', handlePlayerMessage);
+  }, [mediaVisible]);
 
   useEffect(() => {
     if (!iframeRef.current) return;
@@ -186,7 +204,7 @@ export function App() {
         <p className="eyebrow">The complete story</p><h2>See it in action.</h2>
         <div className="video-stage" ref={videoStageRef}>
           {current.youtubeId ? (
-            <iframe ref={iframeRef} key={current.youtubeId} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${current.youtubeId}?enablejsapi=1&autoplay=${mediaStarted ? 1 : 0}&mute=1&playsinline=1&rel=0&cc_load_policy=0&origin=${encodeURIComponent(window.location.origin)}`} title={current.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+            <iframe id="omega-video-player" ref={iframeRef} key={current.youtubeId} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${current.youtubeId}?enablejsapi=1&autoplay=${mediaStarted ? 1 : 0}&mute=1&playsinline=1&rel=0&cc_load_policy=0&origin=${encodeURIComponent(window.location.origin)}`} title={current.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
           ) : (
             <div className="video-placeholder"><img src={current.image} alt="" /><div><span className="play">Play</span><p>{current.title}</p><small>YouTube video ready</small></div></div>
           )}
