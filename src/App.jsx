@@ -33,6 +33,7 @@ const videos = [
   { title: 'AD 8', image: asset('assets/video-thumbnails/ad-8.jpg'), youtubeId: 'PIpwihO54ys' },
 ];
 const playlistIds = videos.map((video) => video.youtubeId);
+const isLocalFile = window.location.protocol === 'file:';
 const waveformBars = Array.from({ length: 72 }, (_, index) => {
   const center = 1 - Math.abs(index - 35.5) / 35.5;
   const texture = Math.abs(Math.sin(index * 1.73) * .62 + Math.cos(index * .47) * .38);
@@ -64,6 +65,7 @@ export function App() {
   soundOnRef.current = soundOn;
 
   useEffect(() => {
+    if (isLocalFile) return undefined;
     const videoStage = videoStageRef.current;
     if (!videoStage) return undefined;
     const observer = new IntersectionObserver(([entry]) => {
@@ -133,6 +135,7 @@ export function App() {
   };
 
   useEffect(() => {
+    if (isLocalFile) return undefined;
     let disposed = false;
     loadYouTubeApi().then((YT) => {
       if (disposed || !iframeRef.current) return;
@@ -160,6 +163,7 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    if (isLocalFile) return;
     if (!iframeRef.current) return;
     if (mediaVisible) requestPlayback();
     else {
@@ -264,16 +268,21 @@ export function App() {
       <section className="media" id="media">
         <p className="eyebrow">The complete story</p><h2>See it in action.</h2>
         <div className="video-stage" ref={videoStageRef}>
-          {current.youtubeId ? (
+          {isLocalFile ? (
+            <a className="video-placeholder local-video" href={`https://www.youtube.com/watch?v=${current.youtubeId}`} target="_blank" rel="noreferrer" aria-label={`Watch ${current.title} on YouTube`}>
+              <img src={current.image} alt="" /><div><span className="play">Play</span><p>{current.title}</p><small>Watch on YouTube</small></div>
+            </a>
+          ) : current.youtubeId ? (
             <iframe id="omega-video-player" ref={iframeRef} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${videos[0].youtubeId}?enablejsapi=1&autoplay=0&mute=1&playsinline=1&rel=0&cc_load_policy=0&loop=1&playlist=${playlistIds.join(',')}&origin=${encodeURIComponent(window.location.origin)}`} title="OMEGA ARIS video playlist" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
           ) : (
             <div className="video-placeholder"><img src={current.image} alt="" /><div><span className="play">Play</span><p>{current.title}</p><small>YouTube video ready</small></div></div>
           )}
         </div>
-        <button className="sound-toggle" type="button" onClick={toggleSound} aria-pressed={soundOn}>
+        {!isLocalFile && <button className="sound-toggle" type="button" onClick={toggleSound} aria-pressed={soundOn}>
           <span className="sound-indicator" aria-hidden="true" />
           {soundOn ? 'Turn volume off' : 'Turn volume on'}
-        </button>
+        </button>}
+        {isLocalFile && <p className="local-video-note">Video playback opens on YouTube in this offline preview. Embedded playback activates automatically when the site is uploaded to a web server.</p>}
         <div className="filmstrip-wrap">
           <button type="button" onClick={() => moveVideo(-1)} aria-label="Previous video">Previous</button>
           <div className="filmstrip" role="tablist" aria-label="Videos">
