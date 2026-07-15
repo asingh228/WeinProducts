@@ -145,8 +145,8 @@ export function App() {
           },
           onStateChange: (event) => {
             if (event.data === YT.PlayerState.PLAYING) {
-              const index = event.target.getPlaylistIndex();
-              if (index >= 0) setActiveVideo(index);
+              const index = playerRef.current?.getPlaylistIndex?.();
+              if (Number.isInteger(index) && index >= 0) setActiveVideo(index);
             }
           },
         },
