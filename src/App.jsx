@@ -174,12 +174,14 @@ export function App() {
 
   const selectVideo = (index) => {
     setActiveVideo(index);
-    if (playerRef.current?.loadPlaylist) {
-      playerRef.current.loadPlaylist(playlistIds, index, 0);
+    if (playerRef.current?.playVideoAt) {
+      playerRef.current.playVideoAt(index);
       if (soundOnRef.current) {
         playerRef.current.unMute();
         window.setTimeout(() => playerRef.current?.unMute?.(), 300);
       }
+    } else {
+      sendPlayerCommand('playVideoAt', [index]);
     }
   };
 
