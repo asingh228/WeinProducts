@@ -3,6 +3,14 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   base: "./",
+  build: {
+    rollupOptions: {
+      output: {
+        format: "iife",
+        inlineDynamicImports: true,
+      },
+    },
+  },
   optimizeDeps: {
     include: ["react", "react-dom/client"],
   },
@@ -13,5 +21,14 @@ export default defineConfig({
       clientFiles: ["./src/main.jsx"],
     },
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: "portable-classic-script",
+      enforce: "post",
+      transformIndexHtml(html) {
+        return html.replace('<script type="module" crossorigin', '<script defer');
+      },
+    },
+  ],
 });
