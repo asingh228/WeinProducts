@@ -215,7 +215,11 @@ export function App() {
           <ComingSoon />
           <blockquote>
             <p>“If you can’t trust your test equipment, nothing else matters in the bullion coin trade.”</p>
-            <footer><strong>Stan Weinberg</strong><span>CHAIRMAN &amp; CEO · WEIN PRODUCTS INC.</span></footer>
+            <footer>
+              <strong>Stan Weinberg</strong>
+              <span>CHAIRMAN &amp; CEO · WEIN PRODUCTS INC.</span>
+              <span className="numismatic-note">Long-standing member of the American Numismatic Association (ANA). Wein Products’ counterfeit-detection work was featured in <em>The Numismatist</em> in “Featuring Fakes” coverage by Virgil Hancock and Charles Hoskins. <a href="https://www.money.org/counterfeit-detection-resources/" target="_blank" rel="noreferrer">Explore the ANA counterfeit-detection archive</a>.</span>
+            </footer>
           </blockquote>
         </div>
         <div className="hero-visual"><img src={asset('assets/productshots/OmegaAris-home.png')} alt="OMEGA ARIS-660B bullion coin tester" /></div>
