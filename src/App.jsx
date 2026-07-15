@@ -32,6 +32,7 @@ const videos = [
   { title: 'AD 7', image: asset('assets/video-thumbnails/ad-7.jpg'), youtubeId: 'CsLT_HktSv8' },
   { title: 'AD 8', image: asset('assets/video-thumbnails/ad-8.jpg'), youtubeId: 'PIpwihO54ys' },
 ];
+const playlistIds = videos.map((video) => video.youtubeId);
 
 function ComingSoon() {
   return <button className="coming" type="button" aria-label="Product coming soon">Coming soon</button>;
@@ -46,9 +47,13 @@ export function App() {
   const videoStageRef = useRef(null);
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
+  const mediaVisibleRef = useRef(false);
+  const soundOnRef = useRef(false);
   const hasEnteredMedia = useRef(false);
   const playerRetryTimers = useRef([]);
   const current = videos[activeVideo];
+  mediaVisibleRef.current = mediaVisible;
+  soundOnRef.current = soundOn;
 
   useEffect(() => {
     const videoStage = videoStageRef.current;
@@ -127,12 +132,14 @@ export function App() {
       playerRef.current = new YT.Player(iframeRef.current, {
         events: {
           onReady: (event) => {
-            if (soundOn) event.target.unMute();
-            if (mediaVisible) event.target.playVideo();
+            event.target.cuePlaylist(playlistIds, activeVideo);
+            if (soundOnRef.current) event.target.unMute();
+            if (mediaVisibleRef.current) event.target.playVideo();
           },
           onStateChange: (event) => {
-            if (event.data === YT.PlayerState.ENDED) {
-              setActiveVideo((value) => (value + 1) % videos.length);
+            if (event.data === YT.PlayerState.PLAYING) {
+              const index = event.target.getPlaylistIndex();
+              if (index >= 0) setActiveVideo(index);
             }
           },
         },
@@ -143,7 +150,7 @@ export function App() {
       playerRef.current?.destroy?.();
       playerRef.current = null;
     };
-  }, [activeVideo]);
+  }, []);
 
   useEffect(() => {
     if (!iframeRef.current) return;
@@ -154,7 +161,15 @@ export function App() {
     }
   }, [mediaVisible, activeVideo]);
 
-  const moveVideo = (direction) => setActiveVideo((value) => (value + direction + videos.length) % videos.length);
+  const selectVideo = (index) => {
+    setActiveVideo(index);
+    if (playerRef.current?.playVideoAt) {
+      playerRef.current.playVideoAt(index);
+      if (soundOnRef.current) playerRef.current.unMute();
+    }
+  };
+
+  const moveVideo = (direction) => selectVideo((activeVideo + direction + videos.length) % videos.length);
 
   return (
     <main style={{
@@ -239,7 +254,7 @@ export function App() {
         <p className="eyebrow">The complete story</p><h2>See it in action.</h2>
         <div className="video-stage" ref={videoStageRef}>
           {current.youtubeId ? (
-            <iframe id="omega-video-player" ref={iframeRef} key={current.youtubeId} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${current.youtubeId}?enablejsapi=1&autoplay=${mediaStarted ? 1 : 0}&mute=1&playsinline=1&rel=0&cc_load_policy=0&origin=${encodeURIComponent(window.location.origin)}`} title={current.title} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+            <iframe id="omega-video-player" ref={iframeRef} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${videos[0].youtubeId}?enablejsapi=1&autoplay=${mediaStarted ? 1 : 0}&mute=1&playsinline=1&rel=0&cc_load_policy=0&origin=${encodeURIComponent(window.location.origin)}`} title="OMEGA ARIS video playlist" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
           ) : (
             <div className="video-placeholder"><img src={current.image} alt="" /><div><span className="play">Play</span><p>{current.title}</p><small>YouTube video ready</small></div></div>
           )}
@@ -252,7 +267,7 @@ export function App() {
           <button type="button" onClick={() => moveVideo(-1)} aria-label="Previous video">Previous</button>
           <div className="filmstrip" role="tablist" aria-label="Videos">
             {videos.map((video, index) => (
-              <button type="button" role="tab" aria-selected={activeVideo === index} className={activeVideo === index ? 'active' : ''} key={video.title} onClick={() => setActiveVideo(index)}>
+              <button type="button" role="tab" aria-selected={activeVideo === index} className={activeVideo === index ? 'active' : ''} key={video.title} onClick={() => selectVideo(index)}>
                 <img src={video.image} alt="" /><span>{video.title}</span>
               </button>
             ))}
