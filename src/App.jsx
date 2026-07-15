@@ -2,6 +2,25 @@ import { useEffect, useRef, useState } from 'react';
 
 const asset = (path) => new URL(`${import.meta.env.BASE_URL}${path}`, document.baseURI).href;
 
+let youtubeApiPromise;
+const loadYouTubeApi = () => {
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+  if (youtubeApiPromise) return youtubeApiPromise;
+  youtubeApiPromise = new Promise((resolve) => {
+    const previousReady = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => {
+      previousReady?.();
+      resolve(window.YT);
+    };
+    if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(script);
+    }
+  });
+  return youtubeApiPromise;
+};
+
 const videos = [
   { title: 'Product overview', image: asset('assets/video-thumbnails/product-overview.jpg'), youtubeId: '0Zgb-dHvVNw' },
   { title: 'AD 1', image: asset('assets/video-thumbnails/ad-1.jpg'), youtubeId: 'crK9x-tPeRA' },
@@ -26,6 +45,7 @@ export function App() {
   const [soundOn, setSoundOn] = useState(false);
   const videoStageRef = useRef(null);
   const iframeRef = useRef(null);
+  const playerRef = useRef(null);
   const hasEnteredMedia = useRef(false);
   const playerRetryTimers = useRef([]);
   const current = videos[activeVideo];
@@ -47,6 +67,11 @@ export function App() {
   }, []);
 
   const sendPlayerCommand = (command, args = []) => {
+    const player = playerRef.current;
+    if (player && typeof player[command] === 'function') {
+      player[command](...args);
+      return;
+    }
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args }), 'https://www.youtube-nocookie.com');
   };
 
@@ -96,19 +121,29 @@ export function App() {
   };
 
   useEffect(() => {
-    const handlePlayerMessage = (event) => {
-      if (!event.origin.includes('youtube')) return;
-      let data = event.data;
-      if (typeof data === 'string') {
-        try { data = JSON.parse(data); } catch { return; }
-      }
-      if (data?.event === 'onStateChange' && data.info === 0 && mediaVisible) {
-        setActiveVideo((value) => (value + 1) % videos.length);
-      }
+    let disposed = false;
+    loadYouTubeApi().then((YT) => {
+      if (disposed || !iframeRef.current) return;
+      playerRef.current = new YT.Player(iframeRef.current, {
+        events: {
+          onReady: (event) => {
+            if (soundOn) event.target.unMute();
+            if (mediaVisible) event.target.playVideo();
+          },
+          onStateChange: (event) => {
+            if (event.data === YT.PlayerState.ENDED) {
+              setActiveVideo((value) => (value + 1) % videos.length);
+            }
+          },
+        },
+      });
+    });
+    return () => {
+      disposed = true;
+      playerRef.current?.destroy?.();
+      playerRef.current = null;
     };
-    window.addEventListener('message', handlePlayerMessage);
-    return () => window.removeEventListener('message', handlePlayerMessage);
-  }, [mediaVisible]);
+  }, [activeVideo]);
 
   useEffect(() => {
     if (!iframeRef.current) return;
