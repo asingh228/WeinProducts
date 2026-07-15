@@ -42,7 +42,6 @@ export function App() {
   const [activeVideo, setActiveVideo] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mediaVisible, setMediaVisible] = useState(false);
-  const [mediaStarted, setMediaStarted] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
   const videoStageRef = useRef(null);
   const iframeRef = useRef(null);
@@ -61,7 +60,6 @@ export function App() {
     const observer = new IntersectionObserver(([entry]) => {
       const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.45;
       setMediaVisible(isVisible);
-      if (isVisible) setMediaStarted(true);
       if (isVisible && !hasEnteredMedia.current) {
         hasEnteredMedia.current = true;
         setActiveVideo(0);
@@ -254,7 +252,7 @@ export function App() {
         <p className="eyebrow">The complete story</p><h2>See it in action.</h2>
         <div className="video-stage" ref={videoStageRef}>
           {current.youtubeId ? (
-            <iframe id="omega-video-player" ref={iframeRef} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${videos[0].youtubeId}?enablejsapi=1&autoplay=${mediaStarted ? 1 : 0}&mute=1&playsinline=1&rel=0&cc_load_policy=0&origin=${encodeURIComponent(window.location.origin)}`} title="OMEGA ARIS video playlist" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
+            <iframe id="omega-video-player" ref={iframeRef} onLoad={initializePlayer} src={`https://www.youtube-nocookie.com/embed/${videos[0].youtubeId}?enablejsapi=1&autoplay=0&mute=1&playsinline=1&rel=0&cc_load_policy=0&loop=1&playlist=${playlistIds.join(',')}&origin=${encodeURIComponent(window.location.origin)}`} title="OMEGA ARIS video playlist" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />
           ) : (
             <div className="video-placeholder"><img src={current.image} alt="" /><div><span className="play">Play</span><p>{current.title}</p><small>YouTube video ready</small></div></div>
           )}
